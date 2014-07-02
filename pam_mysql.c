@@ -603,6 +603,7 @@ static char *pam_mysql_md5_data(const unsigned char *d, unsigned int sz, char *m
 /* {{{ pam_mysql_sha1_data */
 #if defined(HAVE_OPENSSL)
 #define HAVE_PAM_MYSQL_SHA1_DATA
+#define HAVE_PAM_MYSQL_HMAC_SHA256_DATA
 static char *pam_mysql_sha1_data(const unsigned char *d, unsigned int sz, char *md)
 {
 	size_t i, j;
