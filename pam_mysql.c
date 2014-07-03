@@ -119,6 +119,10 @@
 #include <crypt.h>
 #endif
 
+#ifdef HAVE_RESOLV_H
+#include <resolv.h>
+#endif
+
 #ifndef HAVE_OPENSSL
 #ifdef HAVE_MD5_H
 #include <md5.h>
@@ -134,6 +138,7 @@
 #ifdef HAVE_OPENSSL
 #include <openssl/md5.h>
 #include <openssl/sha.h>
+#include <openssl/hmac.h>
 #endif
 
 #ifdef HAVE_MYSQL_H
