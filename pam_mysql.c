@@ -2732,6 +2732,21 @@ static pam_mysql_err_t pam_mysql_check_passwd(pam_mysql_ctx_t *ctx,
 #endif
 				} break;
 
+				case 5: {
+#ifdef HAVE_PAM_MYSQL_HMAC_SHA256_DATA
+					char buf[45];
+					pam_mysql_hmac_sha256_data((unsigned char*)passwd, strlen(passwd),
+							buf, 45);
+					vresult = strcmp(row[0], buf);
+					{
+						char *p = buf - 1;
+						while (*(++p)) *p = '\0';
+					}
+#else
+					syslog(LOG_AUTHPRIV | LOG_ERR, PAM_MYSQL_LOG_PREFIX "non-crypt()ish SHA256 hash is not supported in this build.");
+#endif
+				} break;
+
 				default: {
 				}
 			}
