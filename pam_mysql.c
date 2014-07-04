@@ -2933,6 +2933,22 @@ static pam_mysql_err_t pam_mysql_update_passwd(pam_mysql_ctx_t *ctx, const char 
 #endif
 				break;
 
+				case 5:
+#ifdef HAVE_PAM_MYSQL_HMAC_SHA256_DATA
+					if (NULL == (encrypted_passwd = xcalloc(44 + 1, sizeof(char)))) {
+						syslog(LOG_AUTHPRIV | LOG_CRIT, PAM_MYSQL_LOG_PREFIX "allocation failure at " __FILE__ ":%d", __LINE__);
+						err = PAM_MYSQL_ERR_ALLOC;
+						goto out;
+					}
+					pam_mysql_hmac_sha256_data((unsigned char*)new_passwd,
+							strlen(new_passwd), encrypted_passwd, 45);
+#else
+					syslog(LOG_AUTHPRIV | LOG_ERR, PAM_MYSQL_LOG_PREFIX "non-crypt()ish SHA256 hash is not supported in this build.");
+					err = PAM_MYSQL_ERR_NOTIMPL;
+					goto out;
+#endif
+					break;
+
 			default:
 				encrypted_passwd = NULL;
 				break;
