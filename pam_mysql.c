@@ -634,7 +634,7 @@ static char *pam_mysql_sha1_data(const unsigned char *d, unsigned int sz, char *
 
 static char *pam_mysql_hmac_sha256_data(const unsigned char *d, unsigned int sz, char *md, size_t md_len)
 {
-	char    buf[SHA_DIGEST_LENGTH + 1];
+	char    buf[21]; // SHA_DIGEST_LENGTH + 1
 	size_t  buf_len;
 	char    key[]   = "secret-key";
 	size_t  key_len  = strlen(key);
