@@ -729,6 +729,10 @@ static pam_mysql_err_t pam_mysql_crypt_opt_getter(void *val, const char **pretva
 			*pretval = "sha1";
 			break;
 
+		case 5:
+			*pretval = "hmac_sha256";
+			break;
+
 		default:
 			*pretval = NULL;
 	}
@@ -761,6 +765,10 @@ static pam_mysql_err_t pam_mysql_crypt_opt_setter(void *val, const char *newval_
 		return PAM_MYSQL_ERR_SUCCESS;
 	}
 	if (strcmp(newval_str, "4") == 0 || strcasecmp(newval_str, "sha1") == 0) {
+		*(int *)val = 4;
+		return PAM_MYSQL_ERR_SUCCESS;
+	}
+	if (strcmp(newval_str, "5") == 0 || strcasecmp(newval_str, "hmac_sha256") == 0) {
 		*(int *)val = 4;
 		return PAM_MYSQL_ERR_SUCCESS;
 	}
