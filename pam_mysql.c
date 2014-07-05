@@ -119,10 +119,6 @@
 #include <crypt.h>
 #endif
 
-#ifdef HAVE_RESOLV_H
-#include <resolv.h>
-#endif
-
 #ifndef HAVE_OPENSSL
 #ifdef HAVE_MD5_H
 #include <md5.h>
@@ -159,6 +155,7 @@
 
 #include <pam_appl.h>
 #include <pam_modules.h>
+#include <resolv.h>
 
 /* }}} */
 
