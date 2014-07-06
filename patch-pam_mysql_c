@@ -1,0 +1,126 @@
+diff --git pam_mysql.c pam_mysql.c
+index f252644..a33ed02 100644
+--- pam_mysql.c
++++ pam_mysql.c
+@@ -134,6 +134,7 @@
+ #ifdef HAVE_OPENSSL
+ #include <openssl/md5.h>
+ #include <openssl/sha.h>
++#include <openssl/hmac.h>
+ #endif
+ 
+ #ifdef HAVE_MYSQL_H
+@@ -154,6 +155,7 @@
+ 
+ #include <pam_appl.h>
+ #include <pam_modules.h>
++#include <resolv.h>
+ 
+ /* }}} */
+ 
+@@ -603,6 +605,7 @@ static char *pam_mysql_md5_data(const unsigned char *d, unsigned int sz, char *m
+ /* {{{ pam_mysql_sha1_data */
+ #if defined(HAVE_OPENSSL)
+ #define HAVE_PAM_MYSQL_SHA1_DATA
++#define HAVE_PAM_MYSQL_HMAC_SHA256_DATA
+ static char *pam_mysql_sha1_data(const unsigned char *d, unsigned int sz, char *md)
+ {
+ 	size_t i, j;
+@@ -625,6 +628,30 @@ static char *pam_mysql_sha1_data(const unsigned char *d, unsigned int sz, char *
+ 	return md;
+ }
+ #endif
++
++static char *pam_mysql_hmac_sha256_data(const unsigned char *d, unsigned int sz, char *md, size_t md_len)
++{
++	char    buf[40]; // SHA_DIGEST_LENGTH * 2
++	size_t  buf_len;
++	char    key[]   = "secret-key";
++	size_t  key_len  = strlen(key);
++	
++	memset(buf, 0, 40);
++
++  if (md == NULL) {
++		if ((md = calloc(44 + 1, sizeof(char))) == NULL) {
++			return NULL;
++		}
++      
++  	md_len = 45;
++	}
++
++	HMAC(EVP_sha256(), key, (int)key_len, d, sz, (unsigned char *)buf, (unsigned int *)&buf_len);
++    
++  b64_ntop((const u_char *)buf, buf_len, md, md_len);
++    
++  return md;
++}
+ /* }}} */
+ 
+ /* {{{ option handlers */
+@@ -701,6 +728,10 @@ static pam_mysql_err_t pam_mysql_crypt_opt_getter(void *val, const char **pretva
+ 			*pretval = "sha1";
+ 			break;
+ 
++		case 5:
++			*pretval = "hmac_sha256";
++			break;
++
+ 		default:
+ 			*pretval = NULL;
+ 	}
+@@ -736,6 +767,10 @@ static pam_mysql_err_t pam_mysql_crypt_opt_setter(void *val, const char *newval_
+ 		*(int *)val = 4;
+ 		return PAM_MYSQL_ERR_SUCCESS;
+ 	}
++	if (strcmp(newval_str, "5") == 0 || strcasecmp(newval_str, "hmac_sha256") == 0) {
++		*(int *)val = 5;
++		return PAM_MYSQL_ERR_SUCCESS;
++	}
+ 
+ 	*(int *)val = 0;
+ 
+@@ -2696,6 +2731,21 @@ static pam_mysql_err_t pam_mysql_check_passwd(pam_mysql_ctx_t *ctx,
+ #endif
+ 				} break;
+ 
++				case 5: {
++#ifdef HAVE_PAM_MYSQL_HMAC_SHA256_DATA
++					char buf[45];
++					pam_mysql_hmac_sha256_data((unsigned char*)passwd, strlen(passwd),
++							buf, 45);
++					vresult = strcmp(row[0], buf);
++					{
++						char *p = buf - 1;
++						while (*(++p)) *p = '\0';
++					}
++#else
++					syslog(LOG_AUTHPRIV | LOG_ERR, PAM_MYSQL_LOG_PREFIX "non-crypt()ish SHA256 hash is not supported in this build.");
++#endif
++				} break;
++
+ 				default: {
+ 				}
+ 			}
+@@ -2882,6 +2932,22 @@ static pam_mysql_err_t pam_mysql_update_passwd(pam_mysql_ctx_t *ctx, const char
+ #endif
+ 				break;
+ 
++				case 5:
++#ifdef HAVE_PAM_MYSQL_HMAC_SHA256_DATA
++					if (NULL == (encrypted_passwd = xcalloc(44 + 1, sizeof(char)))) {
++						syslog(LOG_AUTHPRIV | LOG_CRIT, PAM_MYSQL_LOG_PREFIX "allocation failure at " __FILE__ ":%d", __LINE__);
++						err = PAM_MYSQL_ERR_ALLOC;
++						goto out;
++					}
++					pam_mysql_hmac_sha256_data((unsigned char*)new_passwd,
++							strlen(new_passwd), encrypted_passwd, 45);
++#else
++					syslog(LOG_AUTHPRIV | LOG_ERR, PAM_MYSQL_LOG_PREFIX "non-crypt()ish SHA256 hash is not supported in this build.");
++					err = PAM_MYSQL_ERR_NOTIMPL;
++					goto out;
++#endif
++					break;
++
+ 			default:
+ 				encrypted_passwd = NULL;
+ 				break;
