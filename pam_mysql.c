@@ -644,9 +644,9 @@ static char *pam_mysql_hmac_sha256_data(const unsigned char *d, unsigned int sz,
   	md_len = 45;
 	}
 
-	HMAC(EVP_sha256(), key, (int)key_len, d, sz, buf, &buf_len);
+	HMAC(EVP_sha256(), key, (int)key_len, d, sz, (unsigned char *)buf, (unsigned int *)&buf_len);
     
-  b64_ntop(buf, buf_len, md, md_len);
+  b64_ntop((const u_char *)buf, buf_len, md, md_len);
     
   return md;
 }
