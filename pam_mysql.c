@@ -635,6 +635,8 @@ static char *pam_mysql_hmac_sha256_data(const unsigned char *d, unsigned int sz,
 	size_t  buf_len;
 	char    key[]   = "secret-key";
 	size_t  key_len  = strlen(key);
+	
+	memset(buf, 0, 40);
 
   if (md == NULL) {
 		if ((md = calloc(44 + 1, sizeof(char))) == NULL) {
