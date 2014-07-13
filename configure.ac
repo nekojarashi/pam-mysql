@@ -3,7 +3,7 @@ sinclude([pkg.m4])
 
 AC_PREREQ([2.57])
 AC_INIT(pam_mysql, 0.7RC1)
-AM_INIT_AUTOMAKE(pam_mysql, 0.7RC1)
+AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR(pam_mysql.c)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
@@ -22,7 +22,8 @@ AC_PROG_CPP
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
-AC_PROG_LIBTOOL
+
+LT_INIT
 
 AC_HEADER_STDC
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h netdb.h string.h strings.h sys/socket.h sys/types.h sys/stat.h sys/param.h fcntl.h syslog.h unistd.h stdarg.h errno.h crypt.h])
@@ -142,7 +143,7 @@ AC_ARG_WITH([pam_mods_dir], [  --with-pam-mods-dir=DIR specify PAM module instal
 PAM_MYSQL_CHECK_MD5_HEADERS
 PAM_MYSQL_CHECK_CRYPT
 
-AC_SUBST(INCLUDES)
+AC_SUBST(AM_CPPFLAGS)
 AC_SUBST(PAM_MODS_DIR)
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT([pam_mysql.spec])
