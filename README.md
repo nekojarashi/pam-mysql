@@ -1,3 +1,8 @@
+## How to install
+[Install PAM-MySQL on CentOS](https://nekojarashi.qiita.com/y-okubo/items/65076f90529610292995)
+
+## Original README
+```
 pam_mysql - A PAM authentication module against MySQL database.
 $Id: README,v 1.8.2.9 2006/01/09 10:35:59 moriyoshi Exp $
 
@@ -47,11 +52,11 @@ passwd
 host
 
     The host name or the absolute path to the unix socket where the
-	MySQL server is listening.  The following formats are accepted:
+MySQL server is listening.  The following formats are accepted:
 
     1. absolute path to the unix socket (e.g. "/tmp/mysql.sock")
-	2. host name (e.g. "somewhere.example.com")
-	3. host name + port number (e.g. "somewhere.example.com:3306")
+2. host name (e.g. "somewhere.example.com")
+3. host name + port number (e.g. "somewhere.example.com:3306")
 
 db
 
@@ -136,11 +141,11 @@ use_323_passwd (false)
 where
 
     Additional criteria for the query. For example:
-	    [where=Host.name="web" AND User.active=1]
+   [where=Host.name="web" AND User.active=1]
 
 sqllog (false)
 
-	If set to either "true" or "yes", SQL logging is enabled.
+If set to either "true" or "yes", SQL logging is enabled.
 
 logtable
 
@@ -357,4 +362,4 @@ LINKS
 
 - Sendmail-SQL:
   http://www.sourceforge.net/projects/sendmail-sql
-
+```
